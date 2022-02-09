@@ -14,12 +14,12 @@ A nice course on Kivy can be found here:
 ## Brokers   
 Both the local and the global brokers use the MQTT protocol based on publication-subscription mechanism. Are implemented using Mosquitto, that automatically generates the broker.    
 In the development environment, both the local and the global broker are run in the localhost, the global broker in port 1884 and the local broker in port 1883.   
-The basics of MQTT can be found here:
+The basics of MQTT can be found here:   
 [MQTT](https://www.youtube.com/watch?v=EIxdz-2rhLs)   
 More information about Mosquitto and how to install it in Windows and in Linux can be found here.   
 [Mosquitto](https://www.youtube.com/watch?v=DH-VSAACtBk)      
 This is a good example to start using MQTT (using a public broker):    
-[Exa,ple](https://www.youtube.com/watch?v=kuyCd53AOtg)   
+[Exanple](https://www.youtube.com/watch?v=kuyCd53AOtg)   
 
 
 
