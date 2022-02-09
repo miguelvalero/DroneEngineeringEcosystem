@@ -1,2 +1,2 @@
-# Drone Engineering Ecosystem
-https://github.com/miguelvalero/DroneEngineeringEcosystem/blob/main/softwareArchitecture.png
+# Drone Engineering Ecosystem   
+![software-arch](https://github.com/miguelvalero/DroneEngineeringEcosystem/blob/main/softwareArchitecture.png)
