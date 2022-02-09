@@ -1,0 +1,4 @@
+[console_scripts]
+pick-files = filechooser_legacy.main:main
+pick-files-new = filechooser.main:main
+
