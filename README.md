@@ -22,4 +22,5 @@ This is a good example to start using MQTT (using a public broker):
 [Exanple](https://www.youtube.com/watch?v=kuyCd53AOtg)   
 
 
-
+## Suporting materials   
+[Transversal project guide](https://github.com/miguelvalero/DroneEngineeringEcosystem/blob/main/TransversalProjectGuide.pdf)    
