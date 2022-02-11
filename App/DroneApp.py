@@ -1,3 +1,4 @@
+import time
 
 from kivy.app import App
 from kivy.lang import Builder
@@ -19,8 +20,11 @@ import cv2
 from kivy.graphics.texture import Texture
 
 Builder.load_string("""
+
+## the main container has three blocks in vertical (top, buttons and connect blocks)
+
 <TopWidget>:
-     
+# here we will show different elements depending on the button clicked
         size_hint:(1, .8)
         Label:
                 id: wellcome
@@ -72,6 +76,9 @@ class ButtonsWidget(BoxLayout):
     videoStreaming = False
     def __init__(self, **kwargs):
         super(ButtonsWidget, self).__init__(**kwargs)
+
+    # these are the functions to be run when the different buttons are clicked
+
     def startStopSequence (self, a):
         print ('Start')
     def NsecondsSequence (self,a):
@@ -125,7 +132,8 @@ class ButtonsWidget(BoxLayout):
             self.parent.ids.connection.client.publish("autopilotControllerCommand/returnToLaunch")
 
     def LEDsControl(self):
-        print('LEDs controller')
+        # we create in the top block the widget required when LEDs control button is clicled
+        # first remove all widgets in the top block
         self.parent.ids.top.clear_widgets()
 
         self.LEDsLayout = BoxLayout(spacing=10, orientation = "vertical")
@@ -140,9 +148,6 @@ class ButtonsWidget(BoxLayout):
         self.secondsInput = TextInput(multiline=False, size_hint=(.2, 1))
         self.secondsInput.font_size = 100
 
-
-
-
         self.NSecondsLayout.add_widget( self.NSecondsSequenceButton)
         self.NSecondsLayout.add_widget(self.secondsInput)
 
@@ -150,7 +155,9 @@ class ButtonsWidget(BoxLayout):
         self.parent.ids.top.add_widget (self.LEDsLayout)
 
     def CameraControl(self):
-        print('Camera controller')
+        # we create in the top block the widget required when Camera control button is clicled
+        # first remove all widgets in the top block
+        self.parent.ids.top.clear_widgets()
         self.parent.ids.top.clear_widgets()
 
 
@@ -172,7 +179,9 @@ class ButtonsWidget(BoxLayout):
         self.parent.ids.top.add_widget(self.cameraLayout )
 
     def AutopilotControl(self):
-        print('Autopilot controller')
+        # we create in the top block the widget required when Autopilot control button is clicled
+        # first remove all widgets in the top block
+        self.parent.ids.top.clear_widgets()
         self.parent.ids.top.clear_widgets()
         self.autopilotLayout = BoxLayout( orientation="vertical")
 
@@ -233,18 +242,19 @@ class ButtonsWidget(BoxLayout):
         self.parent.ids.top.add_widget(self.autopilotLayout)
 
 class ConnectWidget(BoxLayout):
+    # the only element in the connect block is a button already defined in the builder load string
     connected = False
 
     def __init__(self, **kwargs):
         super(ConnectWidget, self).__init__(**kwargs)
         self.client = mqtt.Client('Dashboard')
-        self.global_broker_address = "147.83.118.92"
+        self.global_broker_address = "127.0.0.1"
         self.global_broker_port = 1884
 
-
+    # to be done when the button is clicked
     def connectWithDronePlatform(self):
         if not self.connected:
-                self.client.connect(self.global_broker_address, self.global_broker_port)
+                self.client.connect(self.global_broker_address)
                 self.client.publish("connectPlatform")
                 self.client.loop_start()
                 self.client.on_message = self.on_message
@@ -252,7 +262,7 @@ class ConnectWidget(BoxLayout):
                 print('Connected with drone platform')
                 self.ids.connect.background_color = .0, 1, 0, 1
                 self.ids.connect.text = "Disconnect"
-
+                # change colors os buttons when connected
 
                 self.parent.ids.buttons.ids.LEDs.background_color = .8, 0, 0, 1
                 self.parent.ids.buttons.ids.Autopilot.background_color = .0, .8, 0, 1
@@ -278,8 +288,6 @@ class ConnectWidget(BoxLayout):
             Clock.schedule_once(partial(self.showVideoFrame, client, userdata, msg))
         if (msg.topic == "autopilotControllerAnswer/droneAltitude"):
             answer = str(msg.payload.decode("utf-8"))
-            print ('tengo la altitud')
-            print (answer)
             self.parent.ids.buttons.altitudeLabel.text = answer[:5]
         if (msg.topic == "autopilotControllerAnswer/droneHeading"):
             answer = str(msg.payload.decode("utf-8"))
@@ -291,36 +299,35 @@ class ConnectWidget(BoxLayout):
             self.parent.ids.buttons.latLabel.text = position[0]
             self.parent.ids.buttons.lonLabel.text = position[1]
 
-
     def showPicture(self, client, userdata, msg, dt):
-        # no se por qué hay que añadir el ultimo parámetro (dt), pero lo cierto es que si no se añade no funciona
-        # Decoding the message
 
+        # ATTENTION: this works well in the computer but not in the android phone
         img = base64.b64decode(msg.payload)
         npimg = np.frombuffer(img, dtype=np.uint8)
         if npimg.size != 0:
             # converting into numpy array from buffer
-            # y también la muestro en wl widget de kivy
             self.frame = cv2.imdecode(npimg, 1)
             buffer = cv2.flip(self.frame, 0).tobytes()
+            shape1 = self.frame.shape[1]
+            shape0 = self.frame.shape[0]
+
             tex = Texture.create(size=(self.frame.shape[1], self.frame.shape[0]), colorfmt='bgr')
             tex.blit_buffer(buffer, colorfmt='bgr', bufferfmt='ubyte')
             self.parent.ids.buttons.pictureImage.texture = tex
 
-
     def showVideoFrame(self, client, userdata, msg, dt):
-        # no se por qué hay que añadir el ultimo parámetro (dt), pero lo cierto es que si no se añade no funciona
-        # Decoding the message
+        # ATTENTION: this works well in the computer but not in the android phone
 
         img = base64.b64decode(msg.payload)
         npimg = np.frombuffer(img, dtype=np.uint8)
         if npimg.size != 0:
             # converting into numpy array from buffer
-            # y también la muestro en wl widget de kivy
+
             self.frame = cv2.imdecode(npimg, 1)
             buffer = cv2.flip(self.frame, 0).tobytes()
             tex = Texture.create(size=(self.frame.shape[1], self.frame.shape[0]), colorfmt='bgr')
             tex.blit_buffer(buffer, colorfmt='bgr', bufferfmt='ubyte')
+
             self.parent.ids.buttons.videoFrameImage.texture = tex
 
 
@@ -328,13 +335,10 @@ class ContainerBox(BoxLayout):
     def __init__(self, **kwargs):
         super(ContainerBox, self).__init__(**kwargs)
 
-        #self.ids.container.remove_widget(self.ids.aaa)
 
 class TestApp(App):
     def build(self):
         return ContainerBox()
-
-
 
 
 if __name__ == '__main__':

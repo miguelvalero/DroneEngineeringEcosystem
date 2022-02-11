@@ -1,8 +1,6 @@
 import base64
-import time
-import tkinter as tk
 
-import cv2
+import tkinter as tk
 import cv2 as cv
 import numpy as np
 from PIL import ImageTk, Image
@@ -12,7 +10,7 @@ import paho.mqtt.client as mqtt
 
 master = tk.Tk()
 client = mqtt.Client('Dashboard')
-global_broker_address = "147.83.118.92"
+global_broker_address ="127.0.0.1"
 global_broker_port = 1884
 
 
@@ -27,6 +25,7 @@ def on_message(client, userdata, message):
         npimg = np.frombuffer(img, dtype=np.uint8)
         # Decode to Original Frame
         img = cv.imdecode(npimg, 1)
+        # show stream in a separate opencv window
         cv.imshow("Stream", img)
         cv.waitKey(1)
     if message.topic == 'cameraControllerAnswer/picture':
@@ -103,12 +102,10 @@ def connectionButtonClicked():
     global connected
     global client
     if not connected:
-        print ('Connect with drone platform')
         connectionButton['text'] = "Disconnect"
         connectionButton['bg'] = "green"
         connected = True
-
-        client.connect(global_broker_address, global_broker_port)
+        client.connect(global_broker_address,  global_broker_port)
         client.publish("connectPlatform")
         client.loop_start()
         client.subscribe("#")

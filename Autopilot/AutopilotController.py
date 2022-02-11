@@ -1,14 +1,12 @@
 
 import paho.mqtt.client as mqtt
-import base64
 import time
-import threading
 
 import dronekit
 from dronekit import connect
 
 
-local_broker_address =  "147.83.118.92"
+local_broker_address =  "127.0.0.1"
 local_broker_port = 1883
 LEDSequenceOn = False
 
@@ -87,7 +85,7 @@ def on_message(client, userdata, message):
 client = mqtt.Client("Autopilot controller")
 client.on_message = on_message
 client.connect(local_broker_address, local_broker_port)
-client.loop_start() # Inicio del bucle
+client.loop_start()
 print ('Waiting DASH connection ....')
 client.subscribe('connectPlatform')
-#time.sleep(100) # Paramos el hilo para recibir mensajes.
+

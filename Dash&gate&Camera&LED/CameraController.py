@@ -1,4 +1,5 @@
 import cv2 as cv
+import numpy as np
 import paho.mqtt.client as mqtt
 import base64
 import time
@@ -6,7 +7,7 @@ import threading
 
 
 
-local_broker_address =  "147.83.118.92"
+local_broker_address =  "127.0.0.1"
 local_broker_port = 1883
 sendingVideoStream = False
 
@@ -14,7 +15,6 @@ def SendVideoStream ():
     global sendingVideoStream
     cap = cv.VideoCapture(0)
     while sendingVideoStream:
-        print ('envio')
         # Read Frame
         _, frame = cap.read()
         # Encoding the Frame
@@ -30,21 +30,20 @@ def SendVideoStream ():
 
 def on_message(client, userdata, message):
     global sendingVideoStream
-    command = str(message.payload.decode("utf-8"))
-    print (command)
     if message.topic == 'connectPlatform':
         print('Camera controller connected')
         client.subscribe('cameraControllerCommand/+')
-
     if message.topic == 'cameraControllerCommand/takePicture':
-        print ('tomo foto')
+        print('Take picture')
         cap = cv.VideoCapture(0)  # video capture source camera (Here webcam of laptop)
         for n in range(10):
+            # this loop is required to discard first frames
             ret, frame = cap.read()
             _, buffer = cv.imencode('.jpg', frame)
             # Converting into encoded bytes
             jpg_as_text = base64.b64encode(buffer)
             client.publish('cameraControllerAnswer/picture', jpg_as_text)
+
     if message.topic == 'cameraControllerCommand/startVideoStream':
         sendingVideoStream = True
         w = threading.Thread(target=SendVideoStream)
@@ -59,8 +58,6 @@ def on_message(client, userdata, message):
 client = mqtt.Client("Camera controller")
 client.on_message = on_message
 client.connect(local_broker_address, local_broker_port)
-client.loop_start() # Inicio del bucle
+client.loop_start()
 print ('Waiting connection from DASH...')
 client.subscribe('connectPlatform')
-#time.sleep(100) # Paramos el hilo para recibir mensajes.
-#client.loop_stop() # Fin del bucle
