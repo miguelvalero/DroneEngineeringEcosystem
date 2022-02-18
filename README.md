@@ -87,5 +87,101 @@ Configure the system interpreter (the versions of python to be used). See this g
 You will have to install some packages during development. Look at this guide for this:        
 [Installing packages](https://www.youtube.com/watch?v=zCO3KxV2zPI&ab_channel=PhilParisi)     
 
+## Drone Engineering Ecosystem installation   
+Follow these steps:     
+1. Log in in your GitHub account. Then make a fork from the Drone Engineering Ecosystem repository. Now you have a copy of the original repository in your account. We will refer to this repository as "forked".    
+2. Clone the forked repository in your computer:   
+```
+   git clone (URL of forked)
+```
+3. Now you have created the "local" repository. The system has created a connector between the local repository and the original. The connector is named "origin". See this with this command:
+```
+   git remote -v
+```
+Now change the the name of the connector:
+```
+   git remote rename origin forked
+```
+And create a new connector between the local repository and the original:
+```
+    git remote add origin https://github.com/miguelvalero/DroneEngineeringEcosystem
+```
+Check that now you have two connectors: "forked" connects your local repository with the forked one, and "origin" connects the local with the original:
+```
+   git remote -v
+```
 
+## Procedure for contributions 
+El ciclo de contribución que hay que seguir es este:
+
+1. El alumno hace en su GitHub personal un fork del repositorio que contiene la versión de desarrollo en curso.
+ 
+2. Se clona la aplicación en local, desde su GitHub:
+```
+   git clone (URL del repositorio de la aplicación en desarrollo)
+```
+3. Se hace la instalación de las dependencias locales (este paso solo habrá que hacerlo en la instalación inicial):
+```
+   npm install
+```
+4. El paso 2 habrá creado un remoto que conecta el repositorio  local con el repositorio en el GitHub personal. Ese remoto se llama origin. Cambiaremos el nombre para que se llame mio.
+```
+  git remote remane origin mio
+```
+ 
+ 
+5. Creamos un remoto llamado origin que conecte el repositorio en local con el repositorio de la versión en desarrollo en curso:
+ 
+
+```
+  git remote add origin (URL del repositorio)
+```
+ 
+6. Crea una rama dev en local para hacer allí los desarrollos:
+```
+  git checkout –b dev
+```
+ 
+7. Cuando tenemos listo un conjunto de cambios de la aplicación, hacemos un commit describiendolos brevemente.
+```
+  git add .
+  git commit –m “Descripción de los desarrollos realizados”
+```
+
+ 
+8. Hace un push en el repositorio del GitHub personal, para que se reflejen los cambios allí.
+```
+  git push mio dev
+```
+  
+En el repositorio del GitHub personal se habrá creado una rama dev con los cambios realizados
+ 
+9. Desde la rama dev del repositorio GitHub personal hacer un pull request para integrar los cambios realizados en la versión en desarrollo en curso. Es importante asegurarse de que los cambios se integran en la rama master de la version en desarrollo. Describir claramente los desarrollos realizados. Al hacer el pull request se indicará si hay conflictos o no. Si no hay conflictos el mismo alumno puede aceptar el pull request (todos tendrán permiso para hacerlo). Si hay conflicto entonces el autor del pull request debe intentar resolver los conflictos y contectar con alguno de los profesores responsables si tiene dificultades para hacerlo.
+ 
+10. Una vez resuelto el pull request, el alumno se trae la versión de desarrollo en curso, en la que se han integrado sus contribuciones con las de otros alumnos.
+ ```
+  git checkout master
+  git pull origin master
+```
+ 
+ 11. Es posible que al descargar la nueva versión el compilador eche en falta algún paquete que ahora sea necesario como consecuencia de los cambios introducidos por algún otro contribuyente. En ese caso se producirá un fallo de compilación y habrá que hacer de nuevo la instalación de todas las dependencias locales:
+ ```
+   npm install
+ ```
+
+   Ahora es necesario pasar todas las pruebas del módulo para verificar que funciona correctamente. Si hubiese que hacer alguna modificación para resolver errores, se procedería tal y como se ha indicado a partir del paso 6.
+ 
+12. Una vez verificado que la aplicacióno funciona correctamente, hay que enviar el código al repositorio del GitHub personal:
+ ```
+   git push mio master
+ ```
+ 
+13. Borra las ramas dev tanto de la copia local como la del repositorio del GitHub personal
+ ```
+   git branch -d dev
+   git push mio --delete dev
+ ```
+
+ 
+En el momento que quiera hacer una nueva contribución, se repite el proceso desde el paso 6.
 
