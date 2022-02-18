@@ -30,7 +30,7 @@ This is a good example to start using MQTT (using a public broker):
 [Transversal project guide](https://github.com/miguelvalero/DroneEngineeringEcosystem/blob/main/TransversalProjectGuide.pdf)    
 
 
-## Installations required   
+## Tools required   
 ### Git and GitHub   
 We use Git and GitHub to have the software available to everybody in the cloud, to manage different versions of the software and to organice the integration of the contributions of different participants in the project.   
 Create a GitHub account if you do not have one.    
