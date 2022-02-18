@@ -1,5 +1,5 @@
 # Drone Engineering Ecosystem   
-![software-arch](https://github.com/miguelvalero/DroneEngineeringEcosystem/issues/1#issue-1142891242)
+![software-arch](https://user-images.githubusercontent.com/32190349/154675065-1e611aed-a102-449d-9592-fafc46df990b.png)
 
 ## Demo   
 [Drone Engineering Ecosystem demo](https://www.youtube.com/playlist?list=PL64O0POFYjHpXyP-T063RdKRJXuhqgaXY)    
