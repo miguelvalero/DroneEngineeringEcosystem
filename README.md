@@ -90,7 +90,8 @@ You will have to install some packages during development. Look at this guide fo
 ## Drone Engineering Ecosystem installation   
 Follow these steps:     
      
-Log in in your GitHub account. Then make a fork from the Drone Engineering Ecosystem repository. Now you have a copy of the original repository in your account. We will refer to this repository as "forked".   ![gift_fork](https://user-images.githubusercontent.com/99663441/154657701-6ed814e4-7092-4c96-ac51-491ae09c7899.gif)
+Log in in your GitHub account. Then make a fork from the Drone Engineering Ecosystem repository. Now you have a copy of the original repository in your account. We will refer to this repository as "forked".![Hnet-image](https://user-images.githubusercontent.com/99663441/154680663-996139d2-17c7-4630-b338-9a1f53b1ff8d.gif)
+
 
 
 Clone the forked repository in your computer:   
