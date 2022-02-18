@@ -28,3 +28,30 @@ This is a good example to start using MQTT (using a public broker):
 
 ## Suporting materials   
 [Transversal project guide](https://github.com/miguelvalero/DroneEngineeringEcosystem/blob/main/TransversalProjectGuide.pdf)    
+
+
+## Installations required   
+### Git and GitHub   
+We use Git and GitHub to have the software available to everybody in the cloud, to manage different versions of the software and to organice the integration of the contributions of different participants in the project.   
+Create a GitHub account if you do not have one. 
+[GitHub](https://github.com/)    
+Install git in your computer.
+[Git] (https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+It is not recommended to install Gui Client because most of the times if you are a developer you may want to work with command lines instead of GUI programs.
+Run these commands in a terminal, for some initial configurations:
+```
+git config --global user.name "Your name"
+git config --global user.email youremail@domain.com
+```
+
+### Mosquitto     
+Download Mosquitto broker:
+[Mosquitto (https://mosquitto.org/download/)
+It is necessary to create in mosquitto folder 2 new conf. files "mosquitto1883" and "mosquitto1884" with the following information RESPECTIVELY:
+listener 1883
+allow_anonymous true
+listener 1884
+allow_anonymous true
+
+
+
