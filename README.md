@@ -33,11 +33,11 @@ This is a good example to start using MQTT (using a public broker):
 ## Installations required   
 ### Git and GitHub   
 We use Git and GitHub to have the software available to everybody in the cloud, to manage different versions of the software and to organice the integration of the contributions of different participants in the project.   
-Create a GitHub account if you do not have one. 
-[GitHub](https://github.com/)    
-Install git in your computer.
-[Git] (https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-It is not recommended to install Gui Client because most of the times if you are a developer you may want to work with command lines instead of GUI programs.
+Create a GitHub account if you do not have one.    
+[GitHub](https://github.com/)      
+Install git in your computer.     
+[Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)      
+It is not recommended to install Gui Client because most of the times if you are a developer you may want to work with command lines instead of GUI programs.      
 Run these commands in a terminal, for some initial configurations:
 ```
 git config --global user.name "Your name"
@@ -45,13 +45,46 @@ git config --global user.email youremail@domain.com
 ```
 
 ### Mosquitto     
-Download Mosquitto broker:
-[Mosquitto (https://mosquitto.org/download/)
-It is necessary to create in mosquitto folder 2 new conf. files "mosquitto1883" and "mosquitto1884" with the following information RESPECTIVELY:
+Download Mosquitto broker:      
+[Mosquitto](https://mosquitto.org/download/)    
+
+In the folder where mosquitto has been downloaded, create two configuration files named "mosquitto1883.conf" and "mosquitto1884.conf". Include the following lines in these files:     
+In "mosquitto1883.conf", that will be the local borker:   
+```
 listener 1883
 allow_anonymous true
+```
+In "mosquitto1884.conf", that will be the global broker:   
+```
 listener 1884
 allow_anonymous true
+```
+You can start running the local broker with this command (from a terminal opened in the mosquitto folder):
+```
+ .\mosquitto -c mosquitto1883.conf
+```
+Do the same to start the global broker, from another terminal.
+
+### Mission Planner     
+Download and install the latest Mission Planner installer:      
+[Mission Planner](https://ardupilot.org/planner/docs/mission-planner-installation.html)     
+
+
+### Python
+You will need two versions of Python: python2.7 for the autopilot module and python3.7 for the rest
+[python3.7](https://www.python.org/downloads/release/python-370/)    
+[python2.7](https://www.python.org/downloads/release/python-2718/)    
+
+
+### PyCharm 
+PyCharm is the recommended IDE for development in Python.   
+[PyCharm](https://www.jetbrains.com/pycharm/)   
+
+Configure the system interpreter (the versions of python to be used). See this guide:   
+[Configure interpreter](https://www.jetbrains.com/help/pycharm/configuring-local-python-interpreters.html)   
+You will have to install some packages during development. Look at this guide for this:
+Surely, some of the packages that are used in the project are not installed, for this, you must look at the following guide:      
+[Installing packages](https://www.youtube.com/watch?v=zCO3KxV2zPI&ab_channel=PhilParisi)     
 
 
 
