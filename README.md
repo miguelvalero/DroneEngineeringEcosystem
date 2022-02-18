@@ -89,23 +89,29 @@ You will have to install some packages during development. Look at this guide fo
 
 ## Drone Engineering Ecosystem installation   
 Follow these steps:     
-1. Log in in your GitHub account. Then make a fork from the Drone Engineering Ecosystem repository. Now you have a copy of the original repository in your account. We will refer to this repository as "forked".    
-2. Clone the forked repository in your computer:   
+     
+Log in in your GitHub account. Then make a fork from the Drone Engineering Ecosystem repository. Now you have a copy of the original repository in your account. We will refer to this repository as "forked".    
+     
+Clone the forked repository in your computer:   
 ```
    git clone (URL of forked)
 ```
-3. Now you have created the "local" repository. The system has created a connector between the local repository and the original. The connector is named "origin". See this with this command:
+      
+Now you have created the "local" repository. The system has created a connector between the local repository and the original. The connector is named "origin". See this with this command:
 ```
    git remote -v
 ```
+      
 Now change the the name of the connector:
 ```
    git remote rename origin forked
 ```
-And create a new connector between the local repository and the original:
+     
+Create a new connector between the local repository and the original:
 ```
     git remote add origin https://github.com/miguelvalero/DroneEngineeringEcosystem
 ```
+     
 Check that now you have two connectors: "forked" connects your local repository with the forked one, and "origin" connects the local with the original:
 ```
    git remote -v
