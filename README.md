@@ -63,6 +63,7 @@ You can start running the local broker with this command (from a terminal opened
 ```
  .\mosquitto -c mosquitto1883.conf
 ```
+     
 Do the same to start the global broker, from another terminal.
 
 ### Mission Planner     
@@ -71,7 +72,7 @@ Download and install the latest Mission Planner installer:
 
 
 ### Python
-You will need two versions of Python: python2.7 for the autopilot module and python3.7 for the rest
+You will need two versions of Python: python2.7 for the autopilot module and python3.7 for the rest:       
 [python3.7](https://www.python.org/downloads/release/python-370/)    
 [python2.7](https://www.python.org/downloads/release/python-2718/)    
 
@@ -82,8 +83,8 @@ PyCharm is the recommended IDE for development in Python.
 
 Configure the system interpreter (the versions of python to be used). See this guide:   
 [Configure interpreter](https://www.jetbrains.com/help/pycharm/configuring-local-python-interpreters.html)   
-You will have to install some packages during development. Look at this guide for this:
-Surely, some of the packages that are used in the project are not installed, for this, you must look at the following guide:      
+      
+You will have to install some packages during development. Look at this guide for this:        
 [Installing packages](https://www.youtube.com/watch?v=zCO3KxV2zPI&ab_channel=PhilParisi)     
 
 
