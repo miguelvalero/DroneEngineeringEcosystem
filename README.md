@@ -127,23 +127,30 @@ These are the steps for contributing, assuming that you have cloned the projects
 ```
   git checkout –b dev
 ```
+          
 2. Develop whatever you want to develop, and test until you are sure that everything is correct.
+          
 3. Commit the changes:
 ```
   git add .
   git commit –m “Description of your development”
 ```
+                   
 4. Push the changes to your forked repo:
 ```
   git push forked dev
 ```
+           
 5. From the dev branch of forked repo, make a pull request to integrate the changes into origin. It is important to make sure that the changes are integrated into the main branch of origin. Clearly describe the developments made. When making the pull request, it will be indicated if there are conflicts or not. If there are no conflicts accept the pull request. If there is a conflict then try to resolve the conflicts or contact one of the responsible teachers if you have difficulties to do so.
+           
 6. Download in your local repo the result of the integration:
 ```
   git checkout main
   git pull origin main
 ```
+         
 7. Check that everything is running ok in the new version (which may contain recent developments from other contributors).
+             
 8. Unload the new version to your forked repo:
 ```
   git push forked main
