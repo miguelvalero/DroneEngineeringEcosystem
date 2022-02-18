@@ -119,76 +119,37 @@ Check that now you have two connectors: "forked" connects your local repository 
 ```
 
 ## Procedure for contributions 
-El ciclo de contribución que hay que seguir es este:
+Contributions must be integrated in the original repo only after exhaustive test of correctness.     
 
-1. El alumno hace en su GitHub personal un fork del repositorio que contiene la versión de desarrollo en curso.
- 
-2. Se clona la aplicación en local, desde su GitHub:
-```
-   git clone (URL del repositorio de la aplicación en desarrollo)
-```
-3. Se hace la instalación de las dependencias locales (este paso solo habrá que hacerlo en la instalación inicial):
-```
-   npm install
-```
-4. El paso 2 habrá creado un remoto que conecta el repositorio  local con el repositorio en el GitHub personal. Ese remoto se llama origin. Cambiaremos el nombre para que se llame mio.
-```
-  git remote remane origin mio
-```
- 
- 
-5. Creamos un remoto llamado origin que conecte el repositorio en local con el repositorio de la versión en desarrollo en curso:
- 
+These are the steps for contributing, assuming that you have cloned the projects, as indicated in the previous section.     
 
-```
-  git remote add origin (URL del repositorio)
-```
- 
-6. Crea una rama dev en local para hacer allí los desarrollos:
+1. Create a branch for your developments:
 ```
   git checkout –b dev
 ```
- 
-7. Cuando tenemos listo un conjunto de cambios de la aplicación, hacemos un commit describiendolos brevemente.
+2. Develop whatever you want to develop, and test until you are sure that everything is correct.
+3. Commit the changes:
 ```
   git add .
-  git commit –m “Descripción de los desarrollos realizados”
+  git commit –m “Description of your development”
 ```
-
- 
-8. Hace un push en el repositorio del GitHub personal, para que se reflejen los cambios allí.
+4. Push the changes to your forked repo:
 ```
-  git push mio dev
+  git push forked dev
 ```
-  
-En el repositorio del GitHub personal se habrá creado una rama dev con los cambios realizados
- 
-9. Desde la rama dev del repositorio GitHub personal hacer un pull request para integrar los cambios realizados en la versión en desarrollo en curso. Es importante asegurarse de que los cambios se integran en la rama master de la version en desarrollo. Describir claramente los desarrollos realizados. Al hacer el pull request se indicará si hay conflictos o no. Si no hay conflictos el mismo alumno puede aceptar el pull request (todos tendrán permiso para hacerlo). Si hay conflicto entonces el autor del pull request debe intentar resolver los conflictos y contectar con alguno de los profesores responsables si tiene dificultades para hacerlo.
- 
-10. Una vez resuelto el pull request, el alumno se trae la versión de desarrollo en curso, en la que se han integrado sus contribuciones con las de otros alumnos.
- ```
-  git checkout master
-  git pull origin master
+5. From the dev branch of forked repo, make a pull request to integrate the changes into origin. It is important to make sure that the changes are integrated into the main branch of origin. Clearly describe the developments made. When making the pull request, it will be indicated if there are conflicts or not. If there are no conflicts accept the pull request. If there is a conflict then try to resolve the conflicts or contact one of the responsible teachers if you have difficulties to do so.
+6. Download in your local repo the result of the integration:
 ```
- 
- 11. Es posible que al descargar la nueva versión el compilador eche en falta algún paquete que ahora sea necesario como consecuencia de los cambios introducidos por algún otro contribuyente. En ese caso se producirá un fallo de compilación y habrá que hacer de nuevo la instalación de todas las dependencias locales:
- ```
-   npm install
- ```
-
-   Ahora es necesario pasar todas las pruebas del módulo para verificar que funciona correctamente. Si hubiese que hacer alguna modificación para resolver errores, se procedería tal y como se ha indicado a partir del paso 6.
- 
-12. Una vez verificado que la aplicacióno funciona correctamente, hay que enviar el código al repositorio del GitHub personal:
- ```
-   git push mio master
- ```
- 
-13. Borra las ramas dev tanto de la copia local como la del repositorio del GitHub personal
- ```
+  git checkout main
+  git pull origin main
+```
+7. Check that everything is running ok in the new version (which may contain recent developments from other contributors).
+8. Unload the new version to your forked repo:
+```
+  git push forked main
+```
+9. Remove development branches:
+```
    git branch -d dev
-   git push mio --delete dev
+   git push forked --delete dev
  ```
-
- 
-En el momento que quiera hacer una nueva contribución, se repite el proceso desde el paso 6.
-
