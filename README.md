@@ -1,6 +1,34 @@
 # Drone Engineering Ecosystem   
 ![software-arch](https://user-images.githubusercontent.com/32190349/155320787-f8549148-3c93-448b-b79a-388623ca5d3f.png)
 
+## General description
+
+The Drone Engineering Ecosystem is a software tool that allows controlling the operation of various types of drones. It allows  to establish flight plans, record flight data and manage the information collected.   
+    
+The ecosystem contanis several modules, that are briefly descrived in the following.
+
+* *Dashboard*: a desktop application that allows the global control of the system. from the dashboard the user can select the drone platform, control de drone operation and manage the data involved in the mission.
+   
+* *Movile app*: an app for smartphones that implements a subset of the functionalities of the dashboard. 
+ 
+* *Autopilot service*: an on board module that controls the autopilot to execute the commands coming form the Dashboard or the Movile app (arm, takeoff, go to position, etc.) 
+
+* *Camera service*: an on board module that controls the on board camera  to execute the commands coming form the Dashboard or the Movile app (take a picture, get the video stream, etc.)   
+   
+* *LEDs serice*: an on board module that controls the LEDs of the drone platform to inform on the status ot the drone platform, as required by other modules.    
+  
+* *gate*: connects the on board modules with the external modules.    
+
+* *Local broker*: on board middleware that connects the on board modules through publications and subscriction.   
+
+* *Global broker*: middleware that connects the gate with the external modules through publications and subscriction.    
+
+* *API Rest*: a server that provides data storage and retrieval through HTTP basic operations (GET, POST, PUT, DELETE).      
+
+* *Data service*: provides the requiered by the rest of modules interface to access data in the API Rest via publications and subscriptions.    
+
+The Mission Planner module that appears in the figure does not belong to the Ecosystem, but is used for development purposes, since it provides an autopilot simulator, so that the ecosystem can be developed and tested without requiring a real drone platform.
+ 
 ## Demo   
 [Drone Engineering Ecosystem demo](https://www.youtube.com/playlist?list=PL64O0POFYjHpXyP-T063RdKRJXuhqgaXY)    
       
@@ -25,6 +53,9 @@ More information about Mosquitto and how to install it in Windows and in Linux c
 This is a good example to start using MQTT (using a public broker):    
 [Exanple](https://www.youtube.com/watch?v=kuyCd53AOtg)   
 
+## API Rest   
+The API Rest module has been build using the Flask framework. A very simple and clear example on how to use Flask (in Spanish) can be found here:    
+[Flask](https://youtu.be/Esdj9wlBOaI)
 
 ## Suporting materials   
 [Transversal project guide](https://github.com/miguelvalero/DroneEngineeringEcosystem/blob/main/TransversalProjectGuide.pdf)    
