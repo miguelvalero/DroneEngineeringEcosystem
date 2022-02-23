@@ -15,7 +15,7 @@ The ecosystem contanis several modules, that are briefly descrived in the follow
 
 * *Camera service*: an on board module that controls the on board camera  to execute the commands coming form the Dashboard or the Movile app (take a picture, get the video stream, etc.)   
    
-* *LEDs serice*: an on board module that controls the LEDs of the drone platform to inform on the status ot the drone platform, as required by other modules.    
+* *LEDs service*: an on board module that controls the LEDs of the drone platform to inform on the status ot the drone platform, as required by other modules.    
   
 * *gate*: connects the on board modules with the external modules.    
 
