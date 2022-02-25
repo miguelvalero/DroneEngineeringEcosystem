@@ -74,17 +74,33 @@ class TopWidget(BoxLayout):
 
 class ButtonsWidget(BoxLayout):
     videoStreaming = False
+    lEDSequence = False
+
     def __init__(self, **kwargs):
         super(ButtonsWidget, self).__init__(**kwargs)
 
     # these are the functions to be run when the different buttons are clicked
 
     def startStopSequence (self, a):
-        print ('Start')
+        global lEDSequence
+        if not self.lEDSequence:
+            self.lEDSequence = True
+            print('Start LED sequence')
+            self.parent.ids.connection.client.publish("LEDsControllerCommand/startLEDsSequence")
+        else:
+            self.lEDSequence = False
+            print('Stop LED sequence')
+            self.parent.ids.connection.client.publish("LEDsControllerCommand/stopLEDsSequence")
     def NsecondsSequence (self,a):
-        print  ('Nseconds')
-        print (self.secondsInput.text)
-        self.parent.ids.connection.client.publish("LEDsControllerCommand/LEDsSequenceForNSeconds", self.secondsInput.text)
+        if not self.lEDSequence:
+            if self.secondsInput.text:
+                self.lEDSequence = True
+                print('LED sequence for ' + str(self.secondsInput.text) + ' seconds')
+                self.parent.ids.connection.client.publish("LEDsControllerCommand/LEDsSequenceForNSeconds", self.secondsInput.text)
+            else:
+                print('Enter the duration of the sequence')
+        else:
+            print('Should Stop the LED sequence first')
 
     def takePicture (self, a):
         print ('take a picture')
@@ -137,7 +153,7 @@ class ButtonsWidget(BoxLayout):
         self.parent.ids.top.clear_widgets()
 
         self.LEDsLayout = BoxLayout(spacing=10, orientation = "vertical")
-        self.sequenceButton = Button(text='Start LED sequence')
+        self.sequenceButton = Button(text='Start/Stop LED sequence')
         self.sequenceButton.bind(on_press=self.startStopSequence)
         self.LEDsLayout.add_widget(self.sequenceButton)
 
