@@ -9,9 +9,9 @@ local_broker_port = 1883
 sendingVideoStream = False
 
 def on_local_message(client, userdata, message):
-    # just pass the answer to the global broker
-    if 'Answer' in message.topic:
-        global_client.publish(message.topic, message.payload)
+    # just pass the message to the global broker
+
+    global_client.publish(message.topic, message.payload)
 
 
 def on_global_message(client, userdata, message):
@@ -32,6 +32,7 @@ def on_global_message(client, userdata, message):
         local_client.subscribe('LEDsControllerAnswer/+')
         local_client.subscribe('cameraControllerAnswer/+')
         local_client.subscribe('autopilotControllerAnswer/+')
+        local_client.subscribe('dataService/+')
         print ('Gate connected')
     if 'Command' in message.topic:
         # just pass the commend to the local broker

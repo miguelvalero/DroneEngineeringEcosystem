@@ -1,9 +1,11 @@
+import threading
 
 import paho.mqtt.client as mqtt
 import time
 
 import dronekit
 from dronekit import connect
+import requests
 
 
 local_broker_address =  "127.0.0.1"
@@ -37,10 +39,25 @@ def takeOff(aTargetAltitude):
             break
         time.sleep(1)
 
+def sendPosition():
+    global timer
+    # get the position and send it to the data service
+    lat = vehicle.location.global_frame.lat
+    lon = vehicle.location.global_frame.lon
+    position = str(lat) + '*' + str(lon)
+    print ("send new position")
+    client.publish("dataService/storePosition", position)
+    # we will repeat this in 5 seconds
+    timer= threading.Timer(5.0, sendPosition)
+    timer.start()
+
+
+timer = threading.Timer(5.0, sendPosition)
 
 def on_message(client, userdata, message):
     global LEDSequenceOn
     global vehicle
+    global timer
     if message.topic == 'connectPlatform':
         print ('Autopilot controller connected')
         client.subscribe('autopilotControllerCommand/+')
@@ -75,8 +92,14 @@ def on_message(client, userdata, message):
         lon = float (position[1])
         point = dronekit.LocationGlobalRelative (lat,lon, 20)
         vehicle.simple_goto(point)
+        # we start a procedure to get the drone position every 5 seconds
+        # and send it to the data service (to be stored there)
+        timer = threading.Timer(5.0, sendPosition)
+        sendPosition()
 
     if message.topic == 'autopilotControllerCommand/returnToLaunch':
+        # stop the process of getting positions
+        timer.cancel()
         vehicle.mode = dronekit.VehicleMode("RTL")
 
     if message.topic == 'autopilotControllerCommand/disarmDrone':

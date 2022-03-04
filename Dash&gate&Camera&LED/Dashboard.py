@@ -1,24 +1,30 @@
 import base64
+import json
+import os
+import subprocess
+import time
 
 import tkinter as tk
 import cv2 as cv
 import numpy as np
 from PIL import ImageTk, Image
-from tkinter import scrolledtext, font, W
+from tkinter import scrolledtext, font, W, CENTER
+from  tkinter import ttk
 
 import paho.mqtt.client as mqtt
+from djitellopy import Tello
 
 master = tk.Tk()
 client = mqtt.Client('Dashboard')
 global_broker_address ="127.0.0.1"
 global_broker_port = 1884
 
-
 # treatment of messages received from gate through the global broker
 
 def on_message(client, userdata, message):
     global panel
     global lbl
+    global table
     if message.topic == "cameraControllerAnswer/videoFrame":
         img = base64.b64decode(message.payload)
         # converting into numpy array from buffer
@@ -57,6 +63,21 @@ def on_message(client, userdata, message):
         position = positionStr.split('*')
         latLbl['text'] = position[0]
         lonLbl['text'] = position[1]
+
+    if  (message.topic == "dataServiceAnswer/storedPositions"):
+        # receive the positions stored by the data service
+        data = message.payload.decode("utf-8")
+        # converts received string to json
+        dataJson = json.loads(data)
+        cont = 0
+        for dataItem in dataJson:
+            table.insert(parent='', index='end', iid=cont, text='',
+                    values=(dataItem['time'], dataItem['lat'], dataItem['lon']))
+            cont = cont + 1
+
+        table.pack()
+
+
 
 client.on_message = on_message
 
@@ -123,9 +144,93 @@ def connectionButtonClicked():
         ledsControlFrame.pack_forget()
         cameraControlFrame.pack_forget()
 
-connectionButton = tk.Button(connectionFrame, text="Connect with drone platform", width = 100, bg='red', fg="white", command=connectionButtonClicked)
+connectionButton = tk.Button(connectionFrame, text="Connect with drone platform", width = 50, bg='red', fg="white", command=connectionButtonClicked)
 connectionButton.grid(row = 0, column = 0, padx=60, pady=20)
+def connectionTelloButtonClicked():
+    global telloDroneWindow
+    global tellosTable
+    # We will open a specific window to operate with tello drone
+    telloDroneWindow = tk.Toplevel(master)
+    telloDroneWindow.title("Tello drone management")
 
+    telloDroneWindow.geometry("600x600")
+    # In this table we will show the tello drones available at that moment
+    tellosTable = ttk.Treeview(telloDroneWindow)
+    tellosTable['columns'] = ('avaliables')
+
+    tellosTable.column("#0", width=0, stretch=tk.NO)
+    tellosTable.column("avaliables", anchor=tk.CENTER, width=550)
+
+    tellosTable.heading("#0", text="", anchor=tk.CENTER)
+    tellosTable.heading("avaliables", text="Available Tellos", anchor=tk.CENTER)
+    # the selected row in the table will be shown in green
+    style = ttk.Style()
+    style.map('Treeview', background=[('selected', 'green')])
+
+    # the next command is to get all the access points availables (including the tello drones)
+
+    r = subprocess.run(["netsh", "wlan", "show", "network"], capture_output=True, text=True).stdout
+    ls = r.split("\n")
+
+    # select the access points corresponding to tello drones
+
+    ssids = [k for k in ls if 'TELLO' in k]
+
+    for i in range (len(ssids)):
+        # insert in the table the SSID of every tello drone
+        tellosTable.insert(parent='', index='end', iid=i, text='',
+                     values=(ssids[i].split(':')[1]))
+        i = i + 1
+    # when double click in a row go to OnDoubleClick
+    tellosTable.bind("<Double-1>", OnDoubleClick)
+    tellosTable.pack()
+
+    # create button for basic operations with selected drone
+    telloTakeOffButton = tk.Button(telloDroneWindow, text="TakeOff", width=20, bg='red', fg="white",
+                                 command=telloTakeOffButtonClicked).pack(padx=5, side = tk.LEFT)
+    telloForwardButton = tk.Button(telloDroneWindow, text="Forward", width=20, bg='red', fg="white",
+                                   command=telloForwardButtonClicked).pack(padx=5, side = tk.LEFT)
+    telloRotateButton = tk.Button(telloDroneWindow, text="Rotate", width=20, bg='red', fg="white",
+                                   command=telloRotateButtonClicked).pack(padx=5, side = tk.LEFT)
+    telloLandButton = tk.Button(telloDroneWindow, text="Land", width=20, bg='red', fg="white",
+                                  command=telloLandButtonClicked).pack(padx=5, side = tk.LEFT)
+
+
+def telloTakeOffButtonClicked():
+    global tello
+    tello.takeoff()
+    time.sleep(3)
+
+def telloForwardButtonClicked():
+    global tello
+    tello.move_forward(50)
+    time.sleep(3)
+
+def telloRotateButtonClicked():
+    global tello
+    tello.rotate_counter_clockwise(90)
+    time.sleep(3)
+
+def telloLandButtonClicked():
+    global tello
+    tello.land()
+
+
+def OnDoubleClick(event):
+    global tello
+    global telloDroneWindow
+    # get the selected SSID
+    item = tellosTable.selection()[0]
+    ssid = tellosTable.item(item, "values")[0]
+    # this command is to connect to the selected access point
+    command = "netsh wlan connect name=" + ssid + " interface=Wi-Fi"
+    os.system(command)
+    tello = Tello()
+    tello.connect()
+
+
+connectionTelloButton = tk.Button(connectionFrame, text="Connect with Tello Drone", width = 50, bg='red', fg="white", command=connectionTelloButtonClicked)
+connectionTelloButton.grid(row = 0, column = 1, padx=60, pady=20)
 
 # top frame -------------------------------------------
 topFrame = tk.Frame (master)
@@ -252,6 +357,45 @@ def returnToLaunchButtonClicked():
 returnToLaunchButton = tk.Button(autopilotSet, text="Return To Launch", bg='red', fg="white",  width = 40, command=returnToLaunchButtonClicked)
 returnToLaunchButton.grid(column=0, row=5,  pady = 5, columnspan=6, sticky=tk.W)
 
+
+def openWindowToShowRecordedPositions():
+    # Open a new small window to show the positions timestamp to be received from the data service
+    global newWindow
+    global table
+    newWindow = tk.Toplevel(master)
+
+
+    newWindow.title("Recorded positions")
+
+    newWindow.geometry("400x400")
+    table = ttk.Treeview(newWindow)
+
+    table['columns'] = ('time', 'latitude', 'longitude')
+
+    table.column("#0", width=0, stretch=tk.NO)
+    table.column("time", anchor=tk.CENTER, width=150)
+    table.column("latitude", anchor=tk.CENTER, width=80)
+    table.column("longitude", anchor=tk.CENTER, width=80)
+
+
+    table.heading("#0", text="", anchor=tk.CENTER)
+    table.heading("time", text="Time", anchor=tk.CENTER)
+    table.heading("latitude", text="Latitude", anchor=tk.CENTER)
+    table.heading("longitude", text="Longitude", anchor=tk.CENTER)
+
+    # requiere the stored positions from the data service
+    client.publish("dataService/getStoredPositions")
+
+    closeButton = tk.Button(newWindow, text="Close", bg='red', fg="white", command=closeWindowToShowRecordedPositions).pack()
+
+
+
+def closeWindowToShowRecordedPositions ():
+    global newWindow
+    newWindow.destroy()
+
+showRecordedPositionsButton = tk.Button(autopilotSet, text="Show recorded positions", bg='red', fg="white",  width = 40, command=openWindowToShowRecordedPositions)
+showRecordedPositionsButton.grid(column=0, row=6,  pady = 5, columnspan=6, sticky=tk.W)
 
 # LEDs control frame ----------------------
 ledsControlFrame = tk.LabelFrame(topFrame, text="LEDs control", padx=5, pady=5)
