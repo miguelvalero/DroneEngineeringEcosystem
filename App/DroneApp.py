@@ -86,17 +86,17 @@ class ButtonsWidget(BoxLayout):
         if not self.lEDSequence:
             self.lEDSequence = True
             print('Start LED sequence')
-            self.parent.ids.connection.client.publish("LEDsControllerCommand/startLEDsSequence")
+            self.parent.ids.connection.client.publish("droneApp/LEDsService/startLEDsSequence")
         else:
             self.lEDSequence = False
             print('Stop LED sequence')
-            self.parent.ids.connection.client.publish("LEDsControllerCommand/stopLEDsSequence")
+            self.parent.ids.connection.client.publish("droneApp/LEDsService/stopLEDsSequence")
     def NsecondsSequence (self,a):
         if not self.lEDSequence:
             if self.secondsInput.text:
                 self.lEDSequence = True
                 print('LED sequence for ' + str(self.secondsInput.text) + ' seconds')
-                self.parent.ids.connection.client.publish("LEDsControllerCommand/LEDsSequenceForNSeconds", self.secondsInput.text)
+                self.parent.ids.connection.client.publish("droneApp/LEDsService/LEDsSequenceForNSeconds", self.secondsInput.text)
             else:
                 print('Enter the duration of the sequence')
         else:
@@ -104,48 +104,48 @@ class ButtonsWidget(BoxLayout):
 
     def takePicture (self, a):
         print ('take a picture')
-        self.parent.ids.connection.client.publish("cameraControllerCommand/takePicture")
+        self.parent.ids.connection.client.publish("droneApp/cameraService/takePicture")
 
     def videoStream (self, a):
         if not self.videoStreaming:
             print ('Start video stream')
-            self.parent.ids.connection.client.publish("cameraControllerCommand/startVideoStream")
+            self.parent.ids.connection.client.publish("droneApp/cameraService/startVideoStream")
             self.videoStreaming = True
             self.videoStreamButton.text = "Stop video stream"
         else :
             print('Stop video stream')
-            self.parent.ids.connection.client.publish("cameraControllerCommand/stopVideoStream")
+            self.parent.ids.connection.client.publish("droneApp/cameraService/stopVideoStream")
             self.videoStreaming = False
             self.videoStreamButton.text = "Start video stream"
 
     def armDisarm(self, a):
         print ('Arm disarm')
-        self.parent.ids.connection.client.publish("autopilotControllerCommand/armDrone")
+        self.parent.ids.connection.client.publish("droneApp/autopilotService/armDrone")
 
     def getAltitude(self, a):
             print('get Altitude')
-            self.parent.ids.connection.client.publish("autopilotControllerCommand/getDroneAltitude")
+            self.parent.ids.connection.client.publish("droneApp/autopilotService/getDroneAltitude")
     def getHeading(self, a):
             print('get heading')
-            self.parent.ids.connection.client.publish("autopilotControllerCommand/getDroneHeading")
+            self.parent.ids.connection.client.publish("droneApp/autopilotService/getDroneHeading")
 
     def takeOff(self, a):
         print('take off')
         print (self.metersInput.text)
-        self.parent.ids.connection.client.publish("autopilotControllerCommand/takeOff", self.metersInput.text)
+        self.parent.ids.connection.client.publish("droneApp/autopilotService/takeOff", self.metersInput.text)
 
     def getPosition(self, a):
         print('get position')
-        self.parent.ids.connection.client.publish("autopilotControllerCommand/getDronePosition")
+        self.parent.ids.connection.client.publish("droneApp/autopilotService/getDronePosition")
 
     def goTo(self, a):
             print('set position')
             position = self.latInput.text + '*' + self.lonInput.text
-            self.parent.ids.connection.client.publish("autopilotControllerCommand/goToPosition", position)
+            self.parent.ids.connection.client.publish("droneApp/autopilotService/goToPosition", position)
 
     def returnToLaunch(self, a):
             print('return to launch')
-            self.parent.ids.connection.client.publish("autopilotControllerCommand/returnToLaunch")
+            self.parent.ids.connection.client.publish("droneApp/autopilotService/returnToLaunch")
 
     def LEDsControl(self):
         # we create in the top block the widget required when LEDs control button is clicled
@@ -263,18 +263,18 @@ class ConnectWidget(BoxLayout):
 
     def __init__(self, **kwargs):
         super(ConnectWidget, self).__init__(**kwargs)
-        self.client = mqtt.Client('Dashboard')
+        self.client = mqtt.Client('droneApp')
         self.global_broker_address = "127.0.0.1"
         self.global_broker_port = 1884
 
     # to be done when the button is clicked
     def connectWithDronePlatform(self):
         if not self.connected:
-                self.client.connect(self.global_broker_address)
-                self.client.publish("connectPlatform")
+                self.client.connect(self.global_broker_address, self.global_broker_port)
+                self.client.publish("droneApp/gate/connectPlatform")
                 self.client.loop_start()
                 self.client.on_message = self.on_message
-                self.client.subscribe("#")
+                self.client.subscribe("+/droneApp/#")
                 print('Connected with drone platform')
                 self.ids.connect.background_color = .0, 1, 0, 1
                 self.ids.connect.text = "Disconnect"
@@ -298,22 +298,27 @@ class ConnectWidget(BoxLayout):
 
 
     def on_message(self, client, userdata, msg):
-        if msg.topic == 'cameraControllerAnswer/picture':
-            Clock.schedule_once(partial(self.showPicture, client, userdata, msg))
-        if msg.topic == "cameraControllerAnswer/videoFrame":
-            Clock.schedule_once(partial(self.showVideoFrame, client, userdata, msg))
-        if (msg.topic == "autopilotControllerAnswer/droneAltitude"):
-            answer = str(msg.payload.decode("utf-8"))
-            self.parent.ids.buttons.altitudeLabel.text = answer[:5]
-        if (msg.topic == "autopilotControllerAnswer/droneHeading"):
-            answer = str(msg.payload.decode("utf-8"))
-            self.parent.ids.buttons.headingLabel.text = answer[:5]
-
-        if (msg.topic == "autopilotControllerAnswer/dronePosition"):
-            positionStr = str(msg.payload.decode("utf-8"))
-            position = positionStr.split('*')
-            self.parent.ids.buttons.latLabel.text = position[0]
-            self.parent.ids.buttons.lonLabel.text = position[1]
+        splited = msg.topic.split('/')
+        origin = splited[0]
+        destination = splited[1]
+        command = splited[2]
+        if origin == "cameraService":
+            if command == "videoFrame":
+                Clock.schedule_once(partial(self.showVideoFrame, client, userdata, msg))
+            if command == 'picture':
+                Clock.schedule_once(partial(self.showPicture, client, userdata, msg))
+        if origin == "autopilotService":
+            if command == "droneAltitude":
+                answer = str(msg.payload.decode("utf-8"))
+                self.parent.ids.buttons.altitudeLabel.text = answer[:5]
+            if command == "droneHeading":
+                answer = str(msg.payload.decode("utf-8"))
+                self.parent.ids.buttons.headingLabel.text = answer[:5]
+            if command == "dronePosition":
+                positionStr = str(msg.payload.decode("utf-8"))
+                position = positionStr.split('*')
+                self.parent.ids.buttons.latLabel.text = position[0]
+                self.parent.ids.buttons.lonLabel.text = position[1]
 
     def showPicture(self, client, userdata, msg, dt):
 

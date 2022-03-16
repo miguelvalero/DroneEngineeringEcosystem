@@ -23,22 +23,29 @@ def LEDSequence ():
 
 def on_message(client, userdata, message):
     global LEDSequenceOn
+    splited = message.topic.split('/')
+    origin = splited[0]
+    destination = splited[1]
+    command = splited[2]
 
-    if message.topic == 'connectPlatform':
-        print ('LEDs controller connected')
-        client.subscribe('LEDsControllerCommand/+')
+    if command == 'connectPlatform':
+        print ('LEDs service connected by ' + origin)
+        # aqui en realidad solo debería subscribirse a los comandos que llegan desde el dispositivo
+        # que ordenó la conexión, pero esa información no la tiene porque el origen de este mensaje
+        # es el gate. NO COSTARIA MUCHO RESOLVER ESTO. HAY QUE VER SI ES NECESARIO
+        client.subscribe('+/LEDsService/#')
 
-    if message.topic == 'LEDsControllerCommand/startLEDsSequence':
+    if command == 'startLEDsSequence':
         print ('Start LED sequence')
         LEDSequenceOn = True
         w = threading.Thread(target=LEDSequence)
         w.start()
 
-    if message.topic == 'LEDsControllerCommand/stopLEDsSequence':
+    if command == 'stopLEDsSequence':
         print('Stop LED sequence')
         LEDSequenceOn = False
 
-    if message.topic == 'LEDsControllerCommand/LEDsSequenceForNSeconds':
+    if command == 'LEDsSequenceForNSeconds':
         seconds = int (message.payload.decode("utf-8"))
         print ('LED sequence for ' + str(seconds) + 'seconds')
         LEDSequenceOn = True
@@ -48,9 +55,9 @@ def on_message(client, userdata, message):
         LEDSequenceOn = False
 
 
-client = mqtt.Client("LED controller")
+client = mqtt.Client("LEDs service")
 client.on_message = on_message
 client.connect(local_broker_address, local_broker_port)
 client.loop_start()
 print ('Waiting connection from DASH...')
-client.subscribe('connectPlatform')
+client.subscribe('gate/LEDsService/connectPlatform')

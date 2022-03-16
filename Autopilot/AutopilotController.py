@@ -46,7 +46,7 @@ def sendPosition():
     lon = vehicle.location.global_frame.lon
     position = str(lat) + '*' + str(lon)
     print ("send new position")
-    client.publish("dataService/storePosition", position)
+    client.publish("autopilotService/dataService/storePosition", position)
     # we will repeat this in 5 seconds
     timer= threading.Timer(5.0, sendPosition)
     timer.start()
@@ -58,34 +58,46 @@ def on_message(client, userdata, message):
     global LEDSequenceOn
     global vehicle
     global timer
-    if message.topic == 'connectPlatform':
-        print ('Autopilot controller connected')
-        client.subscribe('autopilotControllerCommand/+')
+
+    splited = message.topic.split('/')
+    origin = splited[0]
+    destination = splited[1]
+    command = splited[2]
+
+    if command == 'connectPlatform':
+        print('Autopilot service connected by ' + origin)
+
+
+
+        client.subscribe('+/autopilotService/#')
+
         connection_string = "tcp:127.0.0.1:5763"
         vehicle = connect(connection_string, wait_ready=True, baud=115200)
 
-    if message.topic == 'autopilotControllerCommand/armDrone':
+    if command == 'armDrone':
         arm ()
-    if message.topic == 'autopilotControllerCommand/takeOff':
+    if command == 'takeOff':
         altitude = float (message.payload)
         takeOff (altitude)
 
-    if message.topic == 'autopilotControllerCommand/getDroneAltitude':
-        client.publish("autopilotControllerAnswer/droneAltitude", vehicle.location.global_relative_frame.alt)
 
-    if message.topic == 'autopilotControllerCommand/getDroneHeading':
-        client.publish("autopilotControllerAnswer/droneHeading" ,vehicle.heading)
+    if command == 'getDroneHeading':
+        client.publish('autopilotService/' + origin + '/droneHeading' , vehicle.heading)
 
-    if message.topic == 'autopilotControllerCommand/getDroneGroundSpeed':
-        client.publish("autopilotControllerAnswer/droneGroundSpeed", vehicle.groundspeed)
+    if command == 'getDroneAltitude':
+        client.publish('autopilotService/' + origin + '/droneAltitude', vehicle.location.global_relative_frame.alt)
 
-    if message.topic == 'autopilotControllerCommand/getDronePosition':
+
+    if command == 'getDroneGroundSpeed':
+        client.publish('autopilotService/' + origin +  '/droneGroundSpeed', vehicle.groundspeed)
+
+    if command == 'getDronePosition':
         lat = vehicle.location.global_frame.lat
         lon = vehicle.location.global_frame.lon
         position = str(lat) + '*' + str(lon)
-        client.publish("autopilotControllerAnswer/dronePosition", position)
+        client.publish('autopilotService/' + origin  + '/dronePosition', position)
 
-    if message.topic == 'autopilotControllerCommand/goToPosition':
+    if command == 'goToPosition':
         positionStr = str(message.payload.decode("utf-8"))
         position = positionStr.split ('*')
         lat = float (position[0])
@@ -97,18 +109,18 @@ def on_message(client, userdata, message):
         timer = threading.Timer(5.0, sendPosition)
         sendPosition()
 
-    if message.topic == 'autopilotControllerCommand/returnToLaunch':
+    if command == 'returnToLaunch':
         # stop the process of getting positions
         timer.cancel()
         vehicle.mode = dronekit.VehicleMode("RTL")
 
-    if message.topic == 'autopilotControllerCommand/disarmDrone':
+    if command == 'disarmDrone':
         vehicle.armed = True
 
-client = mqtt.Client("Autopilot controller")
+client = mqtt.Client("Autopilot service")
 client.on_message = on_message
 client.connect(local_broker_address, local_broker_port)
 client.loop_start()
 print ('Waiting DASH connection ....')
-client.subscribe('connectPlatform')
+client.subscribe('gate/autopilotService/connectPlatform')
 
