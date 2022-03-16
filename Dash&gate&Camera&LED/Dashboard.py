@@ -156,6 +156,7 @@ def connectionButtonClicked():
 
 connectionButton = tk.Button(connectionFrame, text="Connect with drone platform", width = 50, bg='red', fg="white", command=connectionButtonClicked)
 connectionButton.grid(row = 0, column = 0, padx=60, pady=20)
+
 # top frame -------------------------------------------
 topFrame = tk.Frame (master)
 
