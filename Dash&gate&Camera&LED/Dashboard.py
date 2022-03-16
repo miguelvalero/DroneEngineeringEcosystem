@@ -25,57 +25,67 @@ def on_message(client, userdata, message):
     global panel
     global lbl
     global table
-    if message.topic == "cameraControllerAnswer/videoFrame":
-        img = base64.b64decode(message.payload)
-        # converting into numpy array from buffer
-        npimg = np.frombuffer(img, dtype=np.uint8)
-        # Decode to Original Frame
-        img = cv.imdecode(npimg, 1)
-        # show stream in a separate opencv window
-        cv.imshow("Stream", img)
-        cv.waitKey(1)
-    if message.topic == 'cameraControllerAnswer/picture':
-        img = base64.b64decode(message.payload)
-        # converting into numpy array from buffer
-        npimg = np.frombuffer(img, dtype=np.uint8)
-        # Decode to Original Frame
-        cv2image = cv.imdecode(npimg, 1)
-        dim = (300, 300)
-        # resize image
-        cv2image = cv.resize(cv2image, dim, interpolation=cv.INTER_AREA)
-        img = Image.fromarray(cv2image)
-        imgtk = ImageTk.PhotoImage(image=img)
-        panel.imgtk = imgtk
-        panel.configure(image=imgtk)
 
-    if (message.topic == "autopilotControllerAnswer/droneAltitude"):
-        answer = str(message.payload.decode("utf-8"))
-        lbl['text'] = answer[:5]
-    if (message.topic == "autopilotControllerAnswer/droneHeading"):
-        answer = str(message.payload.decode("utf-8"))
-        lbl['text'] = answer[:5]
-    if (message.topic == "autopilotControllerAnswer/droneGroundSpeed"):
-        answer = str(message.payload.decode("utf-8"))
-        lbl['text'] = answer[:5]
+    splited = message.topic.split('/')
+    origin = splited[0]
+    destination = splited[1]
+    command = splited[2]
 
-    if (message.topic == "autopilotControllerAnswer/dronePosition"):
-        positionStr = str(message.payload.decode("utf-8"))
-        position = positionStr.split('*')
-        latLbl['text'] = position[0]
-        lonLbl['text'] = position[1]
 
-    if  (message.topic == "dataServiceAnswer/storedPositions"):
-        # receive the positions stored by the data service
-        data = message.payload.decode("utf-8")
-        # converts received string to json
-        dataJson = json.loads(data)
-        cont = 0
-        for dataItem in dataJson:
-            table.insert(parent='', index='end', iid=cont, text='',
-                    values=(dataItem['time'], dataItem['lat'], dataItem['lon']))
-            cont = cont + 1
+    if origin == "cameraService":
 
-        table.pack()
+        if command == "videoFrame":
+            img = base64.b64decode(message.payload)
+            # converting into numpy array from buffer
+            npimg = np.frombuffer(img, dtype=np.uint8)
+            # Decode to Original Frame
+            img = cv.imdecode(npimg, 1)
+            # show stream in a separate opencv window
+            cv.imshow("Stream", img)
+            cv.waitKey(1)
+        if command == 'picture':
+            img = base64.b64decode(message.payload)
+            # converting into numpy array from buffer
+            npimg = np.frombuffer(img, dtype=np.uint8)
+            # Decode to Original Frame
+            cv2image = cv.imdecode(npimg, 1)
+            dim = (300, 300)
+            # resize image
+            cv2image = cv.resize(cv2image, dim, interpolation=cv.INTER_AREA)
+            img = Image.fromarray(cv2image)
+            imgtk = ImageTk.PhotoImage(image=img)
+            panel.imgtk = imgtk
+            panel.configure(image=imgtk)
+    if origin == "autopilotService":
+        if (command == "droneAltitude"):
+            answer = str(message.payload.decode("utf-8"))
+            lbl['text'] = answer[:5]
+        if (command == "droneHeading"):
+            answer = str(message.payload.decode("utf-8"))
+            lbl['text'] = answer[:5]
+        if (command == "droneGroundSpeed"):
+            answer = str(message.payload.decode("utf-8"))
+            lbl['text'] = answer[:5]
+
+        if (command  == "dronePosition"):
+            positionStr = str(message.payload.decode("utf-8"))
+            position = positionStr.split('*')
+            latLbl['text'] = position[0]
+            lonLbl['text'] = position[1]
+
+    if origin == "dataService":
+        if  (command == "storedPositions"):
+            # receive the positions stored by the data service
+            data = message.payload.decode("utf-8")
+            # converts received string to json
+            dataJson = json.loads(data)
+            cont = 0
+            for dataItem in dataJson:
+                table.insert(parent='', index='end', iid=cont, text='',
+                        values=(dataItem['time'], dataItem['lat'], dataItem['lon']))
+                cont = cont + 1
+
+            table.pack()
 
 
 
@@ -127,9 +137,9 @@ def connectionButtonClicked():
         connectionButton['bg'] = "green"
         connected = True
         client.connect(global_broker_address,  global_broker_port)
-        client.publish("connectPlatform")
+        client.publish("dashBoard/gate/connectPlatform")
         client.loop_start()
-        client.subscribe("#")
+        client.subscribe("+/dashBoard/#")
         print('Connected with drone platform')
 
         topFrame.pack(fill=tk.X)
@@ -175,6 +185,7 @@ def connectionTelloButtonClicked():
     # select the access points corresponding to tello drones
 
     ssids = [k for k in ls if 'TELLO' in k]
+    print (ssids)
 
     for i in range (len(ssids)):
         # insert in the table the SSID of every tello drone
@@ -222,11 +233,15 @@ def OnDoubleClick(event):
     # get the selected SSID
     item = tellosTable.selection()[0]
     ssid = tellosTable.item(item, "values")[0]
+    print ('connecting with ', ssid)
     # this command is to connect to the selected access point
     command = "netsh wlan connect name=" + ssid + " interface=Wi-Fi"
     os.system(command)
+    print ('connected')
     tello = Tello()
+    print ('connecting with TELLO')
     tello.connect()
+    print ('connected')
 
 
 connectionTelloButton = tk.Button(connectionFrame, text="Connect with Tello Drone", width = 50, bg='red', fg="white", command=connectionTelloButtonClicked)
@@ -252,13 +267,13 @@ def armDisarmButtonClicked():
             armDisarmButton['text'] = "Disarm drone"
             armDisarmButton['bg'] = "green"
             armed = True
-            client.publish("autopilotControllerCommand/armDrone")
+            client.publish("dashBoard/autopilotService/armDrone")
 
     else:
             armDisarmButton['text'] = "Arm drone"
             armDisarmButton['bg'] = "red"
             armed = False
-            client.publish("autopilotControllerCommand/disarmDrone")
+            client.publish("dashBoard/autopilotService/disarmDrone")
 
 
 
@@ -281,11 +296,11 @@ v1.set(1)
 
 def autopilotGetButtonClicked():
     if v1.get() == "1":
-        client.publish("autopilotControllerCommand/getDroneAltitude")
+        client.publish("dashBoard/autopilotService/getDroneAltitude")
     elif v1.get() == "2":
-        client.publish("autopilotControllerCommand/getDroneHeading")
+        client.publish("dashBoard/autopilotService/getDroneHeading")
     else:
-        client.publish("autopilotControllerCommand/getDroneGroundSpeed")
+        client.publish("dashBoard/autopilotService/getDroneGroundSpeed")
 
 autopilotGetButton = tk.Button(autopilotGet, text="Get", bg='red', fg="white", width = 10, height=5, command=autopilotGetButtonClicked)
 autopilotGetButton.grid(column=5, row=0, columnspan=2, rowspan = 3, padx=10)
@@ -300,7 +315,7 @@ autopilotSet.pack( padx=20)
 
 
 def takeOffButtonClicked():
-    client.publish("autopilotControllerCommand/takeOff", metersEntry.get() )
+    client.publish("dashBoard/autopilotService/takeOff", metersEntry.get() )
 
 takeOffButton = tk.Button(autopilotSet, text="Take Off", bg='red', fg="white",  width = 10, command=takeOffButtonClicked)
 takeOffButton.grid(column=0, row=1, columnspan=2, sticky=tk.W)
@@ -321,7 +336,7 @@ lon = tk.Label(autopilotSet, text="lon")
 lon.grid(column=4, row=2,  columnspan=2,padx = 5 )
 
 def getPositionButtonClicked():
-    client.publish("autopilotControllerCommand/getDronePosition" )
+    client.publish("dashBoard/autopilotService/getDronePosition" )
 
 
 getPositionButton = tk.Button(autopilotSet, text="Get Position", bg='red', fg="white",  width = 10,  command=getPositionButtonClicked)
@@ -335,7 +350,7 @@ lonLbl.grid(column=4, row=3,  columnspan=2,padx = 5 )
 
 def goToButtonClicked():
     position = str (goTolatEntry.get()) + '*' + str(goTolonEntry.get())
-    client.publish("autopilotControllerCommand/goToPosition", position)
+    client.publish("dashBoard/autopilotService/goToPosition", position)
 
 
 
@@ -349,7 +364,7 @@ goTolonEntry = tk.Entry(autopilotSet, width = 10)
 goTolonEntry.grid(column=4, row=4,  columnspan=2,padx = 5 )
 
 def returnToLaunchButtonClicked():
-    client.publish("autopilotControllerCommand/returnToLaunch")
+    client.publish("dashBoard/autopilotService/returnToLaunch")
 
 
 
@@ -384,7 +399,7 @@ def openWindowToShowRecordedPositions():
     table.heading("longitude", text="Longitude", anchor=tk.CENTER)
 
     # requiere the stored positions from the data service
-    client.publish("dataService/getStoredPositions")
+    client.publish("dashBoard/dataService/getStoredPositions")
 
     closeButton = tk.Button(newWindow, text="Close", bg='red', fg="white", command=closeWindowToShowRecordedPositions).pack()
 
@@ -419,16 +434,19 @@ def LEDControlButtonClicked():
             ledControlButton['text'] = "Stop"
             ledControlButton['bg'] = "green"
             lEDSequence = True
-            client.publish("LEDsControllerCommand/startLEDsSequence")
+            print ('Start LEDs sequence')
+            client.publish("dashBoard/LEDsService/startLEDsSequence")
 
         else:
             ledControlButton['text'] = "Start"
             ledControlButton['bg'] = "red"
             lEDSequence = False
-            client.publish("LEDsControllerCommand/stopLEDsSequence")
+            print('Stop LEDs sequence')
+            client.publish("dashBoard/LEDsService/stopLEDsSequence")
 
     if v3.get() == "2":
-            client.publish("LEDsControllerCommand/LEDsSequenceForNSeconds", seconds.get())
+            print('LEDs sequence for N seconds')
+            client.publish("dashBoard/LEDsService/LEDsSequenceForNSeconds", seconds.get())
 
 
 ledControlButton = tk.Button(ledsControlFrame, text="Start", bg='red', fg="white",  width = 10, height = 3, command=LEDControlButtonClicked)
@@ -445,7 +463,7 @@ takePictureFrame.pack(side = tk.LEFT)
 
 def takePictureButtonClicked():
     print ("Take picture")
-    client.publish("cameraControllerCommand/takePicture")
+    client.publish("dashBoard/cameraService/takePicture")
 
 takePictureButton = tk.Button(takePictureFrame, text="Take Picture", width=50, bg='red', fg="white", command=takePictureButtonClicked)
 takePictureButton.grid(column=0, row=0, pady = 20, padx = 20)
@@ -472,13 +490,15 @@ def videoStreamButtonClicked():
         videoStreamButton['text'] = "Stop video stream"
         videoStreamButton['bg'] = "green"
         videoStream = True
-        client.publish("cameraControllerCommand/startVideoStream")
+        print ('Start video stream')
+        client.publish("dashBoard/cameraService/startVideoStream")
 
     else:
         videoStreamButton['text'] = "Start video stream on a separaded window"
         videoStreamButton['bg'] = "red"
         videoStream = False
-        client.publish("cameraControllerCommand/stopVideoStream")
+        print ('Stop video stream')
+        client.publish("dashBoard/cameraService/stopVideoStream")
 
         cv.destroyWindow("Stream")
 
