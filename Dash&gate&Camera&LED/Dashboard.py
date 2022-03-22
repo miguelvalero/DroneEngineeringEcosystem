@@ -91,6 +91,11 @@ def on_message(client, userdata, message):
 
             table.pack()
 
+    if origin == "radiationService":
+        if (command == "Radiation"):
+            answer = str(message.payload.decode("utf-8"))
+            lbl['text'] = answer[:5] + ' mSv'
+
 
 
 client.on_message = on_message
@@ -367,6 +372,24 @@ def LEDControlButtonClicked():
 
 ledControlButton = tk.Button(ledsControlFrame, text="Start", bg='red', fg="white",  width = 10, height = 3, command=LEDControlButtonClicked)
 ledControlButton.grid(column=8, row=1,  padx = 5, columnspan=4, rowspan = 3)
+
+# Radiation control frame ----------------------
+radiationControlFrame = tk.LabelFrame(topFrame, text="Radiation control", padx=5, pady=5)
+radiationControlFrame.pack(padx=20, pady=20);
+
+v4 = tk.StringVar()
+s1r9= tk.Radiobutton(radiationControlFrame,text="Radiation value", variable=v1, value=4).grid(column=0, row=1, columnspan = 5, sticky=tk.W)
+v4.set(1)
+
+def radiationGetButtonClicked():
+    if v4.get() == "1":
+        client.publish("dashBoard/radiationService/getRadiation")
+
+radiationGetButton = tk.Button(radiationControlFrame, text="Get", bg='red', fg="white", width = 10, height=3, command=radiationGetButtonClicked)
+radiationGetButton.grid(column=5, row=0, columnspan=2, rowspan = 3, padx=10)
+
+lbl = tk.Label(radiationControlFrame, text=" ", width = 10, borderwidth=2, relief="sunken")
+lbl.grid(column=7, row=1,  columnspan=2 )
 
 
 

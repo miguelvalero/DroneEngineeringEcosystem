@@ -38,6 +38,7 @@ def on_global_message(client, userdata, message):
         local_client.publish("gate/LEDsService/connectPlatform")
         local_client.publish("gate/cameraService/connectPlatform")
         local_client.publish("gate/autopilotService/connectPlatform")
+        local_client.publish("gate/radiationService/connectPlatform")
 
         # Subscribe to commands from services to the module (dash or App) that connected the platform
         local_client.subscribe('+/' + origin + '/#')
@@ -48,6 +49,7 @@ def on_global_message(client, userdata, message):
         global_client.subscribe(origin+'/LEDsService/#')
         global_client.subscribe(origin+'/cameraService/#')
         global_client.subscribe(origin+'/autopilotService/#')
+        global_client.subscribe(origin + '/radiationService/#')
 
         # subscribe to commands from dataService
 
