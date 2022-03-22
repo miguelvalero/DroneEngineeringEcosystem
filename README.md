@@ -181,6 +181,10 @@ These are the steps for contributing, assuming that you have cloned the projects
   git checkout main
   git pull origin main
 ```
+If the 'main' branch is not updated, use:
+```
+    git merge main dev
+```
          
 7. Check that everything is running ok in the new version (which may contain recent developments from other contributors).
              
