@@ -32,7 +32,7 @@ client.on_message = on_message
 client.connect(local_broker_address, local_broker_port)
 client.loop_start()
 print ('Waiting connection from DASH...')
-client.subscribe('gate/LEDsService/connectPlatform')
+client.subscribe('gate/radiationService/connectPlatform')
 
 # --------------< General information about radiation >----------------------
 # Symptoms in humans due to radiation accumulated during the same day:
