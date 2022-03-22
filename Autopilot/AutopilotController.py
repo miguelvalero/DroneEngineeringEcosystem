@@ -97,6 +97,10 @@ def on_message(client, userdata, message):
         position = str(lat) + '*' + str(lon)
         client.publish('autopilotService/' + origin  + '/dronePosition', position)
 
+    if command == 'getDroneBattery':
+        bat = vehicle.battery.level
+        client.publish('autopilotService/' + origin  + '/droneBattery', bat)
+
     if command == 'goToPosition':
         positionStr = str(message.payload.decode("utf-8"))
         position = positionStr.split ('*')

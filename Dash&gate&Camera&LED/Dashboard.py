@@ -73,6 +73,10 @@ def on_message(client, userdata, message):
             latLbl['text'] = position[0]
             lonLbl['text'] = position[1]
 
+        if (command  == "droneBattery"):
+            answer = str(message.payload.decode("utf-8"))
+            lbl['text'] = answer[:5]
+
     if origin == "dataService":
         if  (command == "storedPositions"):
             # receive the positions stored by the data service
@@ -201,6 +205,7 @@ v1 = tk.StringVar()
 s1r1= tk.Radiobutton(autopilotGet,text="Altitude", variable=v1, value=1).grid(column=0, row=0, columnspan = 5, sticky=tk.W)
 s1r2= tk.Radiobutton(autopilotGet,text="Heading", variable=v1, value=2).grid(column=0, row=1, columnspan = 5, sticky=tk.W)
 s1r3= tk.Radiobutton(autopilotGet,text="Ground Speed", variable=v1, value=3).grid(column=0, row=2, columnspan = 5, sticky=tk.W)
+s1r4= tk.Radiobutton(autopilotGet,text="Battery level", variable=v1, value=4).grid(column=0, row=3, columnspan = 5, sticky=tk.W)
 v1.set(1)
 
 def autopilotGetButtonClicked():
@@ -208,8 +213,10 @@ def autopilotGetButtonClicked():
         client.publish("dashBoard/autopilotService/getDroneAltitude")
     elif v1.get() == "2":
         client.publish("dashBoard/autopilotService/getDroneHeading")
-    else:
+    elif v1.get() == "3":
         client.publish("dashBoard/autopilotService/getDroneGroundSpeed")
+    else:
+        client.publish("dashBoard/autopilotService/getDroneBattery")
 
 autopilotGetButton = tk.Button(autopilotGet, text="Get", bg='red', fg="white", width = 10, height=5, command=autopilotGetButtonClicked)
 autopilotGetButton.grid(column=5, row=0, columnspan=2, rowspan = 3, padx=10)
