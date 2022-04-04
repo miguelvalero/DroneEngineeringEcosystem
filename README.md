@@ -58,7 +58,8 @@ The API Rest module has been build using the Flask framework. A very simple and 
 [Flask](https://youtu.be/Esdj9wlBOaI)
 
 ## Suporting materials   
-[Transversal project guide](https://github.com/miguelvalero/DroneEngineeringEcosystem/blob/main/TransversalProjectGuide.pdf)    
+[Transversal project guide](https://github.com/miguelvalero/DroneEngineeringEcosystem/blob/main/TransversalProjectGuide.pdf)   
+[Deploy the APP in an Android Mobile Phone](https://youtu.be/0-c6p1GblVc)     
 
 
 ## Tools required   
